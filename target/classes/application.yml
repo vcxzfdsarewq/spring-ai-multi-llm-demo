@@ -1,0 +1,13 @@
+spring:
+  application:
+    name: spring-ai-multi-llm-demo
+  ai:
+    openai:
+      api-key: ${OPENAI_API_KEY}
+      chat:
+        options:
+          model: gpt-4o
+          temperature: 0.7
+
+server:
+  port: 8080
