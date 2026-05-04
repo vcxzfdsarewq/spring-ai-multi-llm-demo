@@ -1,0 +1,18 @@
+# Build output
+target/
+
+# IDE
+.idea/
+*.iml
+.vscode/
+!.vscode/settings.json
+!.vscode/extensions.json
+
+# Environment / secrets
+.env
+*.env.local
+src/main/resources/application-local.yml
+
+# OS
+.DS_Store
+Thumbs.db

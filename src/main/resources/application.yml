@@ -1,13 +1,16 @@
 spring:
   application:
     name: spring-ai-multi-llm-demo
+  profiles:
+    active: ollama
   ai:
     openai:
-      api-key: ${OPENAI_API_KEY}
-      chat:
-        options:
-          model: gpt-4o
-          temperature: 0.7
+      api-key: ${OPENAI_API_KEY:dummy-not-used}
 
 server:
   port: 8080
+  servlet:
+    encoding:
+      charset: UTF-8
+      force: true
+      enabled: true

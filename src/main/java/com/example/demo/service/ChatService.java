@@ -4,6 +4,7 @@ import com.example.demo.dto.ChatResponse;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
 
 @Service
 public class ChatService {
@@ -12,7 +13,7 @@ public class ChatService {
     private final String model;
 
     public ChatService(ChatClient chatClient,
-                       @Value("${spring.ai.openai.chat.options.model:gpt-4o}") String model) {
+                       @Value("${app.llm.model}") String model) {
         this.chatClient = chatClient;
         this.model = model;
     }
@@ -23,5 +24,12 @@ public class ChatService {
                 .call()
                 .content();
         return new ChatResponse(answer, model);
+    }
+
+    public Flux<String> stream(String question) {
+        return chatClient.prompt()
+                .user(question)
+                .stream()
+                .content();
     }
 }
