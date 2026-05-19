@@ -3,6 +3,8 @@ package com.example.demo.exception;
 import com.example.demo.dto.ErrorResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.ai.retry.NonTransientAiException;
+import org.springframework.ai.retry.TransientAiException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -29,6 +31,31 @@ public class GlobalExceptionHandler {
                 .findFirst()
                 .orElse("入力値が不正です");
         return new ErrorResponse(message, HttpStatus.BAD_REQUEST.value());
+    }
+
+    @ExceptionHandler(NonTransientAiException.class)
+    @ResponseStatus(HttpStatus.BAD_GATEWAY)
+    public ErrorResponse handleNonTransientAi(NonTransientAiException ex) {
+        log.error("AIプロバイダーで非リトライエラー", ex);
+        return new ErrorResponse(
+                "AIプロバイダーへのリクエストが失敗しました: " + ex.getMessage(),
+                HttpStatus.BAD_GATEWAY.value());
+    }
+
+    @ExceptionHandler(TransientAiException.class)
+    @ResponseStatus(HttpStatus.SERVICE_UNAVAILABLE)
+    public ErrorResponse handleTransientAi(TransientAiException ex) {
+        log.error("AIプロバイダーで一時的エラー", ex);
+        return new ErrorResponse(
+                "AIプロバイダーが一時的に利用できません。時間をおいて再試行してください: " + ex.getMessage(),
+                HttpStatus.SERVICE_UNAVAILABLE.value());
+    }
+
+    @ExceptionHandler(IllegalStateException.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ErrorResponse handleIllegalState(IllegalStateException ex) {
+        log.error("内部処理エラー", ex);
+        return new ErrorResponse(ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR.value());
     }
 
     @ExceptionHandler(Exception.class)

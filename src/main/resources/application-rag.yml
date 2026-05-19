@@ -1,0 +1,22 @@
+# ローカル開発用設定。
+# url / username / password のデフォルト値 (raguser / ragpass) は docker-compose.yml と揃えた
+# 開発用の固定値であり、本番では必ず環境変数または Secrets Manager (AWS / Azure / Vault 等)
+# から注入すること。デフォルト値をコミットしているのは「ローカル起動の摩擦をなくす」ためで、
+# 本番でこのまま使ってはならない。
+spring:
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/ragdb}
+    username: ${SPRING_DATASOURCE_USERNAME:raguser}
+    password: ${SPRING_DATASOURCE_PASSWORD:ragpass}
+    driver-class-name: org.postgresql.Driver
+  ai:
+    vectorstore:
+      pgvector:
+        initialize-schema: true
+        index-type: HNSW
+        distance-type: COSINE_DISTANCE
+        dimensions: 768
+
+app:
+  rag:
+    documents-location: classpath:docs/

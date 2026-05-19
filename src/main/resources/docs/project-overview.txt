@@ -1,0 +1,53 @@
+spring-ai-multi-llm-demo プロジェクト概要
+
+このプロジェクトは Java / Spring Boot / Spring AI を使って、
+業務システムへの生成 AI 機能の組み込みパターンを検証するデモアプリケーションです。
+
+【目的】
+Java バックエンドエンジニアとして、既存業務システムに LLM 機能を安全に統合するための
+実装パターンを習得・実証することを目的としています。
+
+【API エンドポイント一覧】
+
+POST /api/chat
+  通常のチャット API。LLM から全文生成が完了した後に JSON で返す。
+  リクエスト: { "question": "質問文" }
+  レスポンス: { "answer": "回答文", "model": "モデル名" }
+
+POST /api/chat/stream
+  Server-Sent Events によるストリーミングチャット。
+  トークンが生成されるたびにリアルタイムで返す。
+
+POST /api/rag/ingest
+  docs/ ディレクトリ配下の文書を読み込み、Embedding を生成して pgvector に登録する。
+  レスポンス: { "totalChunks": 数, "fileCount": 数, "files": ["ファイル名"] }
+
+POST /api/rag/ask
+  RAG（Retrieval-Augmented Generation）による質問応答 API（実装予定）。
+  文書を検索して文脈として付与した上で LLM に回答させる。
+
+【プロファイル設定】
+
+LLM プロバイダーの切り替えは application.yml の spring.profiles.active で行う。
+  ollama     : Ollama（ローカル LLM）を使用
+  openai     : OpenAI API を使用
+  rag        : pgvector への接続と文書 Embedding 機能を有効化
+
+RAG を有効にする場合は LLM プロファイルと組み合わせる。
+  例: spring.profiles.active=ollama,rag
+
+【技術スタック】
+- Java 21 (LTS)
+- Spring Boot 3.5.x
+- Spring AI 1.1.5（GA 安定版）
+- PostgreSQL + pgvector（ベクトルデータベース）
+- Docker Compose（pgvector コンテナ管理）
+- JUnit 5 / Mockito（テスト）
+
+【環境変数】
+  OLLAMA_BASE_URL       : Ollama サーバー URL（デフォルト: http://localhost:11434）
+  OLLAMA_MODEL          : チャットモデル名（デフォルト: gemma4:e4b）
+  OLLAMA_EMBED_MODEL    : Embedding モデル名（デフォルト: nomic-embed-text）
+  OPENAI_API_KEY        : OpenAI API キー（openai プロファイル使用時は必須）
+  OPENAI_MODEL          : チャットモデル名（デフォルト: gpt-4o）
+  SPRING_DATASOURCE_URL : pgvector 接続 URL（デフォルト: jdbc:postgresql://localhost:5432/ragdb）
